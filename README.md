@@ -26,7 +26,7 @@ This model receives the image of a bird and returns the top 3 most probable spec
 
 From the root folder run
 
-  ```bash
+  ```shell
   ./setup_infra_and_services.sh
   ```
 
@@ -45,17 +45,17 @@ From the root folder we can follow the next steps:
 
   1. On one terminal we need to port-forward our k8s service
 
-    ```bash
+    ```shell
     kubectl port-forward --namespace model-registry svc/model-registry-postgresql 5432:5432
     ```
   2. On another terminal, we need to run the `services/model_registry/migrations/initial_setup.sql` file
 
-    ```bash
+    ```shell
     psql --host localhost --port 5432 -d registry -U postgres -f services/model_registry/migrations/initial_setup.sql
     ```
   3. We can check the database by connecting to it
 
-    ```bash
+    ```shell
     psql --host localhost --port 5432 -d registry -U postgres
     ```
 
