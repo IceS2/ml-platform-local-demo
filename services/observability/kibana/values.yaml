@@ -1,0 +1,7 @@
+---
+ingress:
+  enabled: true
+  hosts:
+    - host: kibana.localhost
+      paths:
+        - path: /

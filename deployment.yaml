@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bird-model
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      model: bird
+  template:
+    metadata:
+      labels:
+        model: bird
+    spec:
+      containers:
+      - name: bird-model
+        image: ices2/bird-model-endpoint:1
+        imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bird-model-service
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    model: bird
+  ports:
+  - port: 8000
+    targetPort: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bird-model-ingress
+spec:
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - pathType: ImplementationSpecific
+            path: "/"
+            backend:
+              service:
+                name: bird-model-service
+                port:
+                  number: 8000
