@@ -112,7 +112,11 @@ locust --headless --users 5 --spawn-rate 1 -t 60s -H localhost -f examples/load_
 locust --headless --users 10 --spawn-rate 2 -t 60s -H localhost -f examples/load_test.py
 ```
 
+**Results with 1 Pod**
+
 ![Results with 1 pod](assets/locust_10_users_2_spawn_60_seconds_1_pod.jpg)
+
+**Results with 2 Pods**
 
 ![Results with 2 pods](assets/locust_10_users_2_spawn_60_seconds_2_pods.jpg)
 
