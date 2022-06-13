@@ -1,5 +1,4 @@
 import logging
-import json_logging
 from typing import List
 from fastapi import FastAPI, UploadFile
 from src.classifier import BirdClassifier, BirdData
