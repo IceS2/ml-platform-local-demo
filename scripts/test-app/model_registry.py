@@ -66,7 +66,7 @@ def insert_dummy_data(model_name: str, image: str, version: str):
     cur.execute(INSERT_MODEL_TO_MODELS, (model_name,))
     cur.execute(SELECT_GET_MODEL_ID.format(model_name=model_name))
     model_id = cur.fetchone()["id"]
-    cur.execute(INSERT_MODEL_TO_MODEL_HISTORY, (model_id, image, version))
+    cur.execute(INSERT_MODEL_TO_MODEL_HISTORY, (model_id, version, image))
 
     connection.commit()
     cur.close()

@@ -78,13 +78,15 @@ def deploy_model_from_registry(model_name: str, version: str):
             )
         subprocess.run(["kubectl", "config", "use-context", "kind-default"])
         subprocess.run(["kubectl", "apply", "-f", f"{tmpdir}/deployment.yaml"])
+        subprocess.run(["kubectl", "wait", "--namespace", "default", "--for=condition=ready", "pod", f"--selector=model={model_name}", "--timeout=300s"])
+
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         model_name = sys.argv[1]
         image = "ices2/bird-model-endpoint"
         version = "1"
-    if len(sys.argv) == 4:
+    elif len(sys.argv) == 4:
         model_name = sys.argv[1]
         image = sys.argv[2]
         version = sys.argv[3]

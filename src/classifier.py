@@ -2,6 +2,7 @@ import os
 import urllib.request
 import numpy as np
 import logging
+import time
 
 import tensorflow.compat.v2 as tf
 import tensorflow_hub as hub
@@ -43,6 +44,7 @@ class BirdClassifier:
             List[BirdData]: Top N results with proper BirdData.
         """
         logger.info(f"Predicting top {n} results for image")
+        start = time.time()
         image = self._prepare_image(image)
         # Generate tensor
         image_tensor = tf.convert_to_tensor(image, dtype=tf.float32)
@@ -50,6 +52,7 @@ class BirdClassifier:
         model_raw_output = self.model.call(image_tensor).numpy()
         sorted_labels = self._order_birds_by_result_score(model_raw_output)
         results = self._get_top_n_results(n, sorted_labels)
+        logger.info("Prediction took %s seconds" % (time.time() - start))
         logger.info(f"Prediction was successful")
         return results
 
@@ -65,7 +68,9 @@ class BirdClassifier:
             KerasLayer from SavedModel.
         """
         logger.debug(f"Loading Model from {model_url}")
+        start = time.time()
         model = hub.KerasLayer(model_url)
+        logger.info("Model Loading took %s seconds" % (time.time() - start))
         logger.debug(f"Model loaded")
         return model
 
@@ -84,6 +89,7 @@ class BirdClassifier:
                 mapped to their IDs.
         """
         logger.debug(f"Loading labels from {labels_url}")
+        start = time.time()
         bird_labels_raw = urllib.request.urlopen(labels_url)
         logger.debug(f"Labels loaded")
 
@@ -100,6 +106,7 @@ class BirdClassifier:
             bird_name = bird_line.split(',')[1]
             birds[bird_id] = {'name': bird_name}
 
+        logger.info("Labels Loading took %s seconds" % (time.time() - start))
         logger.debug(f"Labels parsed")
         return birds
 

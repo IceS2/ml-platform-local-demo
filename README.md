@@ -35,6 +35,7 @@ This should spin up the KinD cluster and all needed services:
   * Kibana (Observability)
   * Logstash (Observability)
   * Filebeat (Observability)
+  * Metricbeat (Observability)
   * PostgreSQL (Model Registry)
   * Nginx Ingress Controller (Ingress Controller)
 
@@ -51,7 +52,8 @@ kubectl port-forward --namespace model-registry svc/model-registry-postgresql 54
   2. On another terminal, we need to run the `services/model_registry/migrations/initial_setup.sql` file
 
 ```shell
-psql --host localhost --port 5432 -d registry -U postgres -f services/model_registry/migrations/initial_setup.sql
+psql --host localhost --port 5432 -d registry -U postgres \
+  -f services/model_registry/migrations/initial_setup.sql
 ```
   3. We can check the database by connecting to it
 
@@ -80,16 +82,39 @@ We're currently deploying the application manually using some Python Scripts for
 
 **Obs.: This should be done after everything is setup and the logs from Logstash are already arriving on ElasticSearch.**
 
-1. Accessing <http://kibana.localhost> we can open the left side menu and scroll down until we find *Stack Management*
-2. When in *Stack Management* we can check the left side menu for *Index Patterns*
-3. Clicking in *Create index pattern* we can just add `logstash*` to the Name field and `@timestamp` to the Timestamp field and create it.
-4. Opening the left side menu and clicking in *Logs* we can then click the *Settings* button on the top right.
-5. Once within the *Settings* screen, we can look for *Indices* and click on *Use Kibana index patterns* in order to select the one we've just created and then click on *Apply*
-6. The logs should appear on the Log Stream now.
+1. Accessing <http://kibana.localhost> we can open the left side menu and scroll down until we find **Stack Management**
+2. When in **Stack Management** we can check the left side menu for **Index Patterns**
+3. Clicking in **Create index pattern** we can just add `logstash*` to the Name field and `@timestamp` to the Timestamp field and create it.
+4. Opening the left side menu and clicking in **Logs** we can then click the **Settings** button on the top right.
+5. Once within the **Settings** screen, we can look for **Indices** and click on **Use Kibana index patterns** in order to select the one we've just created and then click on **Apply**
+6. The logs should appear on the **Log Stream** now or you could explore them on the **Discovery** page.
+7. You can filter application logs by adding `kubernetes.annotations.isModel : *` as a filter
 
 ## How to test the Application
 
-To run the given examples just run `python examples/examples.py`.
+**Obs.: Since we're running all tests locally, it can vary depending on the used computer configuration and on the current load.**
+
+* Simple test
+
+To run a small battery just run `python examples/examples.py`.
+
+* Load testing with locust
+
+To run some load tests we can use [locust](https://locust.io/)
+
+```shell
+locust --headless --users 5 --spawn-rate 1 -t 60s -H localhost -f examples/load_test.py
+```
+
+![Results](assets/locust_5_users_1_spawn_60_seconds_1_pod.jpg)
+
+```shell
+locust --headless --users 10 --spawn-rate 2 -t 60s -H localhost -f examples/load_test.py
+```
+
+![Results with 1 pod](assets/locust_10_users_2_spawn_60_seconds_1_pod.jpg)
+
+![Results with 2 pods](assets/locust_10_users_2_spawn_60_seconds_2_pods.jpg)
 
 ## How to tear down everything
 

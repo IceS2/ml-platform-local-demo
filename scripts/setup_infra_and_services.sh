@@ -33,15 +33,24 @@ kubectl wait --namespace observability \
   --selector=app.kubernetes.io/component=elasticsearch \
   --timeout=300s
 
-# Filebeat
-helm upgrade --install filebeat elastic/filebeat \
-  --namespace observability \
-  -f services/observability/filebeat/values.yaml
-
 # Logstash
 helm upgrade --install logstash elastic/logstash \
   --namespace observability \
   -f services/observability/logstash/values.yaml
+
+kubectl wait --namespace observability \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=logstash \
+  --timeout=300s
+
+# Metricbeat
+helm upgrade --install metricbeat elastic/metricbeat \
+  --namespace observability
+
+# Filebeat
+helm upgrade --install filebeat elastic/filebeat \
+  --namespace observability \
+  -f services/observability/filebeat/values.yaml
 
 # Kibana
 helm upgrade --install kibana elastic/kibana \
